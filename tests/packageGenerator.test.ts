@@ -57,7 +57,7 @@ describe('packageGenerator', () => {
 
     // Verify generated package can be parsed by pdf-lib
     const resultPdf = await PDFDocument.load(packageBytes);
-    // 1 Cover Page + 1 Document Page = 2 Total Pages
-    expect(resultPdf.getPageCount()).toBe(2);
+    // 1 Cover Page + 1 Index Page + 1 Document Page = 3 Total Pages
+    expect(resultPdf.getPageCount()).toBe(3);
   });
 });

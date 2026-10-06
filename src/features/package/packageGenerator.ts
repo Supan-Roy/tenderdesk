@@ -2,6 +2,7 @@ import { PDFDocument } from 'pdf-lib';
 import { TenderInfo, Requirement, UploadedDocument } from '@/types';
 import { sortRequirements } from '@/features/tender/tenderUtils';
 import { addCoverPage } from './coverPage';
+import { addIndexPage } from './indexPage';
 import { addPackageFooters } from './footer';
 
 export interface GeneratePackageParams {
@@ -12,7 +13,8 @@ export interface GeneratePackageParams {
 }
 
 /**
- * Generates the merged final PDF package with cover page and page footers.
+ * Generates the merged final PDF package with cover page, index page, and page footers.
+ * Structure: Page 1 = Cover, Page 2 = Index, Page 3+ = Matched Documents.
  * Returns Uint8Array of the compiled PDF file.
  */
 export async function generatePdfPackage(params: GeneratePackageParams): Promise<Uint8Array> {
@@ -67,10 +69,16 @@ export async function generatePdfPackage(params: GeneratePackageParams): Promise
     generatedDate: todayStr,
   });
 
-  // 6. Add standard page footers "<tender_id> | Page X of Y" to all pages
+  // 6. Insert English Index / Table of Contents page at Page 2 (index 1)
+  await addIndexPage({
+    pdfDoc,
+    matchedRequirements,
+  });
+
+  // 7. Add standard page footers "<tender_id> | Page X of Y" to all pages
   await addPackageFooters(pdfDoc, { tenderId: tender.tender_id });
 
-  // 7. Save and return PDF byte array
+  // 8. Save and return PDF byte array
   return await pdfDoc.save();
 }
 

@@ -135,7 +135,7 @@ describe('Sample Package Generator Deliverable', () => {
 
     // Verify PDF structure
     const loadedPdf = await PDFDocument.load(packageBytes);
-    // 1 Cover Page + 1 Trade License + 1 TIN + 1 VAT + 2 Bank Solvency = 6 Total Pages
-    expect(loadedPdf.getPageCount()).toBe(6);
+    // 1 Cover Page + 1 Index Page + 1 Trade License + 1 TIN + 1 VAT + 2 Bank Solvency = 7 Total Pages
+    expect(loadedPdf.getPageCount()).toBe(7);
   });
 });
