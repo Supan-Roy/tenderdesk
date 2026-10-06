@@ -103,18 +103,32 @@ export function isBlockingStatus(status: DocumentStatus): boolean {
 }
 
 /**
- * Returns list of uploaded documents that are available to be matched to a given requirement
+ * Returns list of uploaded documents that are available to be matched to a given requirement.
+ * Enforces both 1-to-1 document matching AND SHA-256 duplicate content safety
+ * (a duplicate file content group cannot satisfy two different requirements).
  */
 export function getAvailableDocuments(
   allDocuments: UploadedDocument[],
   matches: Record<string, string>,
   currentRequirementId: string
 ): UploadedDocument[] {
-  const matchedDocIds = new Set(
-    Object.entries(matches)
-      .filter(([reqId]) => reqId !== currentRequirementId)
-      .map(([, docId]) => docId)
-  );
+  // Collect IDs of documents matched to OTHER requirements
+  const matchedEntries = Object.entries(matches).filter(([reqId]) => reqId !== currentRequirementId);
+  const matchedDocIds = new Set(matchedEntries.map(([, docId]) => docId));
 
-  return allDocuments.filter((doc) => !matchedDocIds.has(doc.id));
+  // Collect SHA-256 hashes of documents matched to OTHER requirements
+  const matchedHashes = new Set<string>();
+  for (const docId of matchedDocIds) {
+    const doc = allDocuments.find((d) => d.id === docId);
+    if (doc?.hash) {
+      matchedHashes.add(doc.hash);
+    }
+  }
+
+  // Filter out documents whose ID is matched elsewhere OR whose hash is already matched elsewhere
+  return allDocuments.filter((doc) => {
+    if (matchedDocIds.has(doc.id)) return false;
+    if (doc.hash && matchedHashes.has(doc.hash)) return false;
+    return true;
+  });
 }

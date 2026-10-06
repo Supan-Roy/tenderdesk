@@ -5,6 +5,7 @@ import { sampleRequirementsPayload } from '@/data/sampleData';
 import { parseAndValidateRequirementsJson } from '@/features/tender/tenderUtils';
 import { validatePdfFile, getPdfPageCount } from '@/features/documents/pdfUtils';
 import { validateUploadLimits, evaluateRequirementStatus, isBlockingStatus } from '@/features/documents/documentUtils';
+import { calculateFileHash, detectDuplicates } from '@/features/documents/duplicateDetector';
 
 export function useTenderDesk() {
   const [tenderState, dispatchTender] = useReducer(tenderReducer, initialTenderState);
@@ -70,7 +71,8 @@ export function useTenderDesk() {
   };
 
   /**
-   * Handles user selecting multiple PDF files
+   * Handles user selecting multiple PDF files.
+   * Computes SHA-256 hash and page count locally and detects exact duplicate content.
    */
   const handlePdfFilesSelect = async (selectedFiles: FileList | File[]) => {
     setErrorMessage(null);
@@ -100,8 +102,9 @@ export function useTenderDesk() {
           continue;
         }
 
-        // 3. Inspect PDF page count via pdfjs-dist
+        // 3. Inspect PDF page count via pdfjs-dist & calculate SHA-256 hash via Web Crypto API
         const pageCount = await getPdfPageCount(file);
+        const hash = await calculateFileHash(file);
 
         // 4. Create UploadedDocument entry
         const docId = `doc-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
@@ -111,6 +114,7 @@ export function useTenderDesk() {
           fileName: file.name,
           size: file.size,
           pageCount,
+          hash,
         };
 
         newValidDocs.push(docEntry);
@@ -123,7 +127,7 @@ export function useTenderDesk() {
     setIsInspectingPdf(false);
 
     if (newValidDocs.length > 0) {
-      setDocuments((prev) => [...prev, ...newValidDocs]);
+      setDocuments((prev) => detectDuplicates([...prev, ...newValidDocs]));
     }
 
     if (accumulatedErrors.length > 0) {
@@ -185,10 +189,11 @@ export function useTenderDesk() {
   };
 
   /**
-   * Removes an uploaded document by ID & cleans up associated matches/expiry dates
+   * Removes an uploaded document by ID & cleans up associated matches/expiry dates.
+   * Re-evaluates duplicate detection on remaining files.
    */
   const handleRemoveDocument = (id: string) => {
-    setDocuments((prev) => prev.filter((doc) => doc.id !== id));
+    setDocuments((prev) => detectDuplicates(prev.filter((doc) => doc.id !== id)));
 
     let affectedReqId: string | null = null;
     setMatches((prev) => {
