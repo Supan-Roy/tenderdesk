@@ -7,40 +7,102 @@ export function sortRequirements(requirements: Requirement[]): Requirement[] {
   return [...requirements].sort((a, b) => a.order - b.order);
 }
 
+export type ParseJsonResult =
+  | { success: true; data: RequirementsPayload }
+  | { success: false; error: string };
+
 /**
- * Validates requirements JSON structure
+ * Parses and strictly validates requirements.json content against the tender specification schema.
  */
-export function validateRequirementsJson(data: unknown): data is RequirementsPayload {
-  if (!data || typeof data !== 'object') return false;
-  const payload = data as Partial<RequirementsPayload>;
-
-  if (!payload.tender || typeof payload.tender !== 'object') return false;
-  const { tender, requirements } = payload;
-
-  if (
-    typeof tender.tender_id !== 'string' ||
-    typeof tender.title !== 'string' ||
-    typeof tender.procuring_entity !== 'string' ||
-    typeof tender.bidder !== 'string' ||
-    typeof tender.submission_deadline !== 'string'
-  ) {
-    return false;
+export function parseAndValidateRequirementsJson(jsonText: string): ParseJsonResult {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(jsonText);
+  } catch {
+    return {
+      success: false,
+      error: 'requirements.json could not be loaded. Please select a valid JSON file.',
+    };
   }
 
-  if (!Array.isArray(requirements)) return false;
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return {
+      success: false,
+      error: 'Invalid requirements.json format: Root must be a JSON object.',
+    };
+  }
 
-  for (const req of requirements) {
-    if (
-      typeof req.id !== 'string' ||
-      typeof req.order !== 'number' ||
-      typeof req.title_en !== 'string' ||
-      typeof req.title_bn !== 'string' ||
-      typeof req.mandatory !== 'boolean' ||
-      typeof req.has_expiry !== 'boolean'
-    ) {
-      return false;
+  const payload = parsed as Partial<RequirementsPayload>;
+
+  if (!payload.tender || typeof payload.tender !== 'object') {
+    return {
+      success: false,
+      error: 'Invalid requirements.json: Missing "tender" information object.',
+    };
+  }
+
+  const { tender, requirements } = payload;
+
+  if (typeof tender.tender_id !== 'string' || !tender.tender_id.trim()) {
+    return { success: false, error: 'Invalid requirements.json: Missing or invalid "tender_id".' };
+  }
+  if (typeof tender.title !== 'string' || !tender.title.trim()) {
+    return { success: false, error: 'Invalid requirements.json: Missing or invalid tender "title".' };
+  }
+  if (typeof tender.procuring_entity !== 'string' || !tender.procuring_entity.trim()) {
+    return { success: false, error: 'Invalid requirements.json: Missing or invalid "procuring_entity".' };
+  }
+  if (typeof tender.bidder !== 'string') {
+    return { success: false, error: 'Invalid requirements.json: Missing or invalid "bidder".' };
+  }
+  if (typeof tender.submission_deadline !== 'string' || !tender.submission_deadline.trim()) {
+    return { success: false, error: 'Invalid requirements.json: Missing or invalid "submission_deadline".' };
+  }
+
+  if (!Array.isArray(requirements)) {
+    return { success: false, error: 'Invalid requirements.json: "requirements" must be an array.' };
+  }
+
+  if (requirements.length === 0) {
+    return { success: false, error: 'Invalid requirements.json: "requirements" list cannot be empty.' };
+  }
+
+  for (let i = 0; i < requirements.length; i++) {
+    const req = requirements[i];
+    if (!req || typeof req !== 'object') {
+      return { success: false, error: `Invalid requirement item at index ${i}.` };
+    }
+    if (typeof req.id !== 'string' || !req.id.trim()) {
+      return { success: false, error: `Invalid requirement #${i + 1}: Missing "id".` };
+    }
+    if (typeof req.order !== 'number' || isNaN(req.order)) {
+      return { success: false, error: `Invalid requirement "${req.id}": "order" must be a number.` };
+    }
+    if (typeof req.title_en !== 'string') {
+      return { success: false, error: `Invalid requirement "${req.id}": Missing "title_en".` };
+    }
+    if (typeof req.title_bn !== 'string') {
+      return { success: false, error: `Invalid requirement "${req.id}": Missing "title_bn".` };
+    }
+    if (typeof req.mandatory !== 'boolean') {
+      return { success: false, error: `Invalid requirement "${req.id}": "mandatory" must be a boolean.` };
+    }
+    if (typeof req.has_expiry !== 'boolean') {
+      return { success: false, error: `Invalid requirement "${req.id}": "has_expiry" must be a boolean.` };
     }
   }
 
-  return true;
+  return {
+    success: true,
+    data: {
+      tender: {
+        tender_id: tender.tender_id,
+        title: tender.title,
+        procuring_entity: tender.procuring_entity,
+        bidder: tender.bidder,
+        submission_deadline: tender.submission_deadline,
+      },
+      requirements: sortRequirements(requirements as Requirement[]),
+    },
+  };
 }

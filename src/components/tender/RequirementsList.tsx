@@ -1,25 +1,20 @@
 import React from 'react';
-import { Requirement, UploadedDocument, DocumentStatus } from '@/types';
+import { Requirement, UploadedDocument } from '@/types';
 import { useI18n } from '@/i18n';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { evaluateRequirementStatus } from '@/features/documents/documentUtils';
 import { FileText, Clock } from 'lucide-react';
 
 interface RequirementsListProps {
   requirements: Requirement[];
-  documents: UploadedDocument[];
-  matches: Record<string, string>; // requirementId -> documentId
-  expiryDates: Record<string, string>;
-  submissionDeadline?: string;
+  documents?: UploadedDocument[];
+  matches?: Record<string, string>; // requirementId -> documentId
 }
 
 export const RequirementsList: React.FC<RequirementsListProps> = ({
   requirements,
-  documents,
-  matches,
-  expiryDates,
-  submissionDeadline,
+  documents = [],
+  matches = {},
 }) => {
   const { language, t } = useI18n();
 
@@ -29,10 +24,10 @@ export const RequirementsList: React.FC<RequirementsListProps> = ({
         <div>
           <h3 className="text-base font-semibold text-slate-900">{t.requirements.title}</h3>
           <p className="text-xs text-slate-500">
-            Ordered verification checklist according to requirement specifications.
+            Sorted document requirements list from specifications file.
           </p>
         </div>
-        <Badge variant="neutral">{requirements.length} Items</Badge>
+        <Badge variant="neutral">{requirements.length} {t.tenderDetails.documentsCount}</Badge>
       </div>
 
       <div className="overflow-x-auto">
@@ -51,15 +46,6 @@ export const RequirementsList: React.FC<RequirementsListProps> = ({
             {requirements.map((req) => {
               const matchedDocId = matches[req.id];
               const matchedDoc = documents.find((d) => d.id === matchedDocId);
-              const expiryDate = expiryDates[req.id] || matchedDoc?.expiryDate || '';
-
-              const status: DocumentStatus = evaluateRequirementStatus({
-                requirement: req,
-                matchedDocument: matchedDoc,
-                expiryDate,
-                submissionDeadline,
-              });
-
               const title = language === 'bn' ? req.title_bn : req.title_en;
 
               return (
@@ -88,7 +74,7 @@ export const RequirementsList: React.FC<RequirementsListProps> = ({
                     )}
                   </td>
                   <td className="py-3 px-4 text-center">
-                    <Badge status={status}>{t.status[status]}</Badge>
+                    <Badge variant="neutral">{t.requirements.awaitingMatch}</Badge>
                   </td>
                   <td className="py-3 px-4 text-xs text-slate-600">
                     {matchedDoc ? (
@@ -97,7 +83,7 @@ export const RequirementsList: React.FC<RequirementsListProps> = ({
                         <span className="truncate max-w-[200px]">{matchedDoc.fileName}</span>
                       </span>
                     ) : (
-                      <span className="text-slate-400 italic">Unmatched</span>
+                      <span className="text-slate-400 italic font-normal">-</span>
                     )}
                   </td>
                 </tr>
