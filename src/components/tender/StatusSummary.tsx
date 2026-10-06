@@ -3,7 +3,7 @@ import { Requirement, UploadedDocument, DocumentStatus } from '@/types';
 import { useI18n } from '@/i18n';
 import { evaluateRequirementStatus, isBlockingStatus } from '@/features/documents/documentUtils';
 import { Badge } from '@/components/ui/Badge';
-import { AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, CheckSquare } from 'lucide-react';
 
 interface StatusSummaryProps {
   requirements: Requirement[];
@@ -22,7 +22,6 @@ export const StatusSummary: React.FC<StatusSummaryProps> = ({
 }) => {
   const { t } = useI18n();
 
-  // Calculate status counts
   const counts: Record<DocumentStatus, number> = {
     OK: 0,
     MISSING: 0,
@@ -52,40 +51,43 @@ export const StatusSummary: React.FC<StatusSummaryProps> = ({
     }
   }
 
+  const completionPercent = Math.round((counts.OK / (requirements.length || 1)) * 100);
+
   return (
-    <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+    <div className="bg-white border border-slate-200/90 rounded-xl p-4 mb-5 shadow-2xs">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
         {/* Status Count Badges */}
         <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="font-semibold text-slate-700 mr-1">
-            {requirements.length} {t.summary.totalDocs}:
-          </span>
+          <div className="flex items-center space-x-1.5 font-bold text-slate-800 mr-2 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200/80">
+            <CheckSquare className="w-3.5 h-3.5 text-blue-600" />
+            <span>{requirements.length} {t.summary.totalDocs}</span>
+          </div>
 
-          <Badge status="OK" className="space-x-1">
-            <span>{counts.OK} {t.status.OK}</span>
+          <Badge status="OK" className="space-x-1 py-1 px-2.5">
+            <span>🟢 {counts.OK} {t.status.OK}</span>
           </Badge>
 
           {counts.MISSING > 0 && (
-            <Badge status="MISSING" className="space-x-1">
-              <span>{counts.MISSING} {t.status.MISSING}</span>
+            <Badge status="MISSING" className="space-x-1 py-1 px-2.5">
+              <span>🔴 {counts.MISSING} {t.status.MISSING}</span>
             </Badge>
           )}
 
           {counts.EXPIRY_NEEDED > 0 && (
-            <Badge status="EXPIRY_NEEDED" className="space-x-1">
-              <span>{counts.EXPIRY_NEEDED} {t.status.EXPIRY_NEEDED}</span>
+            <Badge status="EXPIRY_NEEDED" className="space-x-1 py-1 px-2.5">
+              <span>🟡 {counts.EXPIRY_NEEDED} {t.status.EXPIRY_NEEDED}</span>
             </Badge>
           )}
 
           {counts.EXPIRED > 0 && (
-            <Badge status="EXPIRED" className="space-x-1">
-              <span>{counts.EXPIRED} {t.status.EXPIRED}</span>
+            <Badge status="EXPIRED" className="space-x-1 py-1 px-2.5">
+              <span>🔴 {counts.EXPIRED} {t.status.EXPIRED}</span>
             </Badge>
           )}
 
           {counts.NOT_PROVIDED > 0 && (
-            <Badge status="NOT_PROVIDED" className="space-x-1">
-              <span>{counts.NOT_PROVIDED} {t.status.NOT_PROVIDED}</span>
+            <Badge status="NOT_PROVIDED" className="space-x-1 py-1 px-2.5">
+              <span>⚪ {counts.NOT_PROVIDED} {t.status.NOT_PROVIDED}</span>
             </Badge>
           )}
         </div>
@@ -93,19 +95,27 @@ export const StatusSummary: React.FC<StatusSummaryProps> = ({
         {/* Blocking Issue Indicator */}
         <div>
           {blockingCount > 0 ? (
-            <div className="inline-flex items-center space-x-1.5 text-xs font-medium text-rose-700 bg-rose-50 px-3 py-1 rounded-md border border-rose-200">
+            <div className="inline-flex items-center space-x-2 text-xs font-semibold text-rose-800 bg-rose-50 px-3.5 py-1.5 rounded-lg border border-rose-200 shadow-2xs">
               <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
               <span>
                 <strong>{blockingCount}</strong> {t.summary.blockingWarning}
               </span>
             </div>
           ) : (
-            <div className="inline-flex items-center space-x-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 px-3 py-1 rounded-md border border-emerald-200">
+            <div className="inline-flex items-center space-x-2 text-xs font-semibold text-emerald-800 bg-emerald-50 px-3.5 py-1.5 rounded-lg border border-emerald-200 shadow-2xs">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>{t.summary.allValid}</span>
             </div>
           )}
         </div>
+      </div>
+
+      {/* Verification Progress Bar */}
+      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200/60">
+        <div
+          className="bg-gradient-to-r from-blue-600 to-emerald-500 h-full transition-all duration-300 rounded-full"
+          style={{ width: `${completionPercent}%` }}
+        />
       </div>
     </div>
   );
