@@ -2,17 +2,20 @@ import React from 'react';
 import { useI18n } from '@/i18n';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { PackageCheck, AlertCircle } from 'lucide-react';
+import { Download, PackageCheck, AlertCircle, Loader2 } from 'lucide-react';
 
 interface PackageActionsProps {
   isValid: boolean;
   blockingCount?: number;
+  isGenerating?: boolean;
   onGeneratePackage?: () => void;
 }
 
 export const PackageActions: React.FC<PackageActionsProps> = ({
   isValid,
   blockingCount = 0,
+  isGenerating = false,
+  onGeneratePackage,
 }) => {
   const { t } = useI18n();
 
@@ -41,13 +44,25 @@ export const PackageActions: React.FC<PackageActionsProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-col items-end space-y-1 w-full sm:w-auto">
-          <Button variant="primary" disabled className="w-full sm:w-auto cursor-not-allowed">
-            <span>{t.package.generateBtn}</span>
+        <div className="flex items-center space-x-3 w-full sm:w-auto">
+          <Button
+            variant="primary"
+            disabled={!isValid || isGenerating}
+            onClick={onGeneratePackage}
+            className="w-full sm:w-auto font-semibold shadow-xs"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <span>Compiling Package...</span>
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4 mr-2" />
+                <span>{t.package.generateBtn}</span>
+              </>
+            )}
           </Button>
-          <span className="text-[11px] text-slate-400 italic">
-            {t.package.disabledNotice}
-          </span>
         </div>
       </div>
     </Card>

@@ -6,6 +6,7 @@ import { parseAndValidateRequirementsJson } from '@/features/tender/tenderUtils'
 import { validatePdfFile, getPdfPageCount } from '@/features/documents/pdfUtils';
 import { validateUploadLimits, evaluateRequirementStatus, isBlockingStatus } from '@/features/documents/documentUtils';
 import { calculateFileHash, detectDuplicates } from '@/features/documents/duplicateDetector';
+import { generatePdfPackage, downloadPdfPackage } from '@/features/package/packageGenerator';
 
 export function useTenderDesk() {
   const [tenderState, dispatchTender] = useReducer(tenderReducer, initialTenderState);
@@ -14,6 +15,7 @@ export function useTenderDesk() {
   const [expiryDates, setExpiryDates] = useState<Record<string, string>>({});
   
   const [isInspectingPdf, setIsInspectingPdf] = useState<boolean>(false);
+  const [isGeneratingPackage, setIsGeneratingPackage] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
 
@@ -226,6 +228,34 @@ export function useTenderDesk() {
   };
 
   /**
+   * Generates and downloads the final compiled PDF package
+   */
+  const handleGeneratePackage = async () => {
+    if (!tenderState.tender) return;
+
+    setIsGeneratingPackage(true);
+    setErrorMessage(null);
+
+    try {
+      const pdfBytes = await generatePdfPackage({
+        tender: tenderState.tender,
+        requirements: tenderState.requirements,
+        documents,
+        matches,
+      });
+
+      downloadPdfPackage(pdfBytes, tenderState.tender.tender_id);
+      setInfoMessage(`Successfully generated "${tenderState.tender.tender_id}_Package.pdf".`);
+    } catch (err: unknown) {
+      console.error('Package generation error:', err);
+      const msg = err instanceof Error ? err.message : 'Failed to generate PDF package.';
+      setErrorMessage(msg);
+    } finally {
+      setIsGeneratingPackage(false);
+    }
+  };
+
+  /**
    * Resets tender workspace state
    */
   const resetAll = () => {
@@ -269,6 +299,7 @@ export function useTenderDesk() {
     matches,
     expiryDates,
     isInspectingPdf,
+    isGeneratingPackage,
     errorMessage,
     infoMessage,
     blockingIssueCount,
@@ -283,6 +314,7 @@ export function useTenderDesk() {
     handleSetExpiryDate,
     handleRemoveDocument,
     handleClearAllDocuments,
+    handleGeneratePackage,
     resetAll,
   };
 }

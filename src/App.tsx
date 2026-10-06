@@ -22,6 +22,7 @@ export const AppContent: React.FC = () => {
     matches,
     expiryDates,
     isInspectingPdf,
+    isGeneratingPackage,
     errorMessage,
     infoMessage,
     blockingIssueCount,
@@ -36,6 +37,7 @@ export const AppContent: React.FC = () => {
     handleSetExpiryDate,
     handleRemoveDocument,
     handleClearAllDocuments,
+    handleGeneratePackage,
     resetAll,
   } = useTenderDesk();
 
@@ -137,7 +139,7 @@ export const AppContent: React.FC = () => {
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider">{t.steps.verifyPackage}</p>
               <p className="text-xs text-slate-500">
-                {isWorkspaceValid ? 'Verification Complete' : `${blockingIssueCount} issue(s) remaining`}
+                {isWorkspaceValid ? 'Ready to Package' : `${blockingIssueCount} issue(s) remaining`}
               </p>
             </div>
           </div>
@@ -249,7 +251,12 @@ export const AppContent: React.FC = () => {
               onClearAll={handleClearAllDocuments}
             />
 
-            <PackageActions isValid={isWorkspaceValid} blockingCount={blockingIssueCount} />
+            <PackageActions
+              isValid={isWorkspaceValid}
+              blockingCount={blockingIssueCount}
+              isGenerating={isGeneratingPackage}
+              onGeneratePackage={handleGeneratePackage}
+            />
           </div>
         )}
       </main>
