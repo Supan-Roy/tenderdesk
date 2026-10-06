@@ -35,7 +35,7 @@ export function autoMatchDocuments(
         if (fn.includes('trade') || fn.includes('license')) {
           score += 100;
           if (fn.includes('2026') || fn.includes('2027') || fn.includes('valid') || fn.includes('updated')) {
-            score += 50; // Prefer valid/updated license over expired ones
+            score += 50; // Prefer 2026/2027 valid license over 2025 expired license
           }
         }
       }
@@ -76,8 +76,8 @@ export function autoMatchDocuments(
       }
 
       // 7. Financial Proposal
-      else if (titleEnLower.includes('financial proposal') || titleBnLower.includes('আর্থিক প্রস্তাব')) {
-        if (fn.includes('financial') || fn.includes('fin_proposal')) {
+      else if (titleEnLower.includes('financial') || titleBnLower.includes('আর্থিক')) {
+        if (fn.includes('financial') || fn.includes('fin')) {
           score += 100;
         }
       }
@@ -103,23 +103,13 @@ export function autoMatchDocuments(
         }
       }
 
-      // Fallback keyword matching
-      else {
-        const wordsEn = titleEnLower.split(/[^a-z0-9]+/i).filter((w) => w.length >= 4);
-        for (const word of wordsEn) {
-          if (fn.includes(word)) {
-            score += 20;
-          }
-        }
-      }
-
       if (score > highestScore) {
         highestScore = score;
         bestMatchDoc = doc;
       }
     }
 
-    if (bestMatchDoc && highestScore >= 20) {
+    if (bestMatchDoc && highestScore >= 50) {
       newMatches[req.id] = bestMatchDoc.id;
     }
   }
