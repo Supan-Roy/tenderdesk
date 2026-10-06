@@ -49,6 +49,9 @@ export function useTenderDesk() {
       },
     });
     setErrorMessage(null);
+    if (documents.length > 0) {
+      setMatches((prevMatches) => autoMatchDocuments(payload.requirements, documents, prevMatches));
+    }
   };
 
   /**
@@ -130,7 +133,13 @@ export function useTenderDesk() {
     setIsInspectingPdf(false);
 
     if (newValidDocs.length > 0) {
-      setDocuments((prev) => detectDuplicates([...prev, ...newValidDocs]));
+      setDocuments((prev) => {
+        const combined = detectDuplicates([...prev, ...newValidDocs]);
+        if (tenderState.requirements.length > 0) {
+          setMatches((prevMatches) => autoMatchDocuments(tenderState.requirements, combined, prevMatches));
+        }
+        return combined;
+      });
     }
 
     if (accumulatedErrors.length > 0) {
