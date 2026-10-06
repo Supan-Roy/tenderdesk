@@ -28,3 +28,7 @@ dist-ssr
 !output/*
 !screenshots/
 !screenshots/*
+
+# Exclude contest sample pack directory from repository
+hackathon/
+hackathon/*
