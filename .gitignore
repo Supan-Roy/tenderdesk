@@ -23,12 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 
-# Output files except .gitkeep
-output/*
-!output/.gitkeep
-
-# Screenshots except .gitkeep
-screenshots/*
-!screenshots/.gitkeep
-
-hackathon/*
+# Ensure contest output and screenshots are tracked in git
+!output/
+!output/*
+!screenshots/
+!screenshots/*
