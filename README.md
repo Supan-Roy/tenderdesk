@@ -8,9 +8,8 @@ TenderDesk helps office staff turn a collection of PDF tender documents into one
 
 ## 👤 Participant Details
 
-- **Name:** [YOUR_NAME_HERE]
-- **Registration Number:** [YOUR_REGISTRATION_NUMBER_HERE]
-- **Live Demo (HTTPS):** [YOUR_LIVE_HTTPS_URL_HERE]
+- **Name:** Supan Roy
+- **Live Demo (HTTPS):** [https://tenderdesk-theta.vercel.app](https://tenderdesk-theta.vercel.app)
 
 ---
 
@@ -29,24 +28,28 @@ npm install
 # 2. Start local development server
 npm run dev
 
-# 3. Build for production
+# 3. Run automated test suite
+npm test
+
+# 4. Build for production
 npm run build
 
-# 4. Preview production build locally
+# 5. Preview production build locally
 npm run preview
 ```
 
 ---
 
-## ✨ Features Architecture
+## ✨ Features & Architecture
 
 - **Requirements Loading:** Dynamic JSON schema ingestion (`requirements.json`).
 - **Client-Side PDF Upload & Inspection:** Fast local PDF page count using `pdfjs-dist`.
-- **Document Matching:** Strict 1-to-1 matching between requirements and uploaded files.
+- **1-to-1 Document Matching:** Interactive requirement-to-file matching workflow.
 - **Expiry Validation:** Automated document validity check relative to tender submission deadline (`MISSING`, `EXPIRY_NEEDED`, `EXPIRED`, `NOT_PROVIDED`, `OK`).
+- **Real-Time Status Summary:** Dynamic status checklist & blocking issue warning indicators.
 - **Content Duplicate Detection:** Browser SHA-256 content hashing via Web Crypto API.
-- **Package Generation:** Native PDF merge with cover page and standard footers (`<tender_id> | Page X of Y`) via `pdf-lib`.
 - **Bilingual Support:** Lightweight i18n supporting English (`en`) and Bangla (`bn`).
+- **Automated Test Suite:** Comprehensive Vitest tests for tender JSON parsing, document status rules, matching invariants, and duplicate detection.
 
 ---
 
@@ -67,15 +70,10 @@ npm run preview
 
 - **Framework:** React 19 + TypeScript
 - **Bundler:** Vite 6
+- **Testing:** Vitest
 - **Styling:** Tailwind CSS
 - **PDF Libraries:** `pdf-lib` (generation/merging), `pdfjs-dist` (inspection/counting)
 - **Icons:** `lucide-react`
-
----
-
-## ⚠️ Known Issues / Limitations
-
-- Initial workspace architecture setup complete. Full workflow logic pending implementation step.
 
 ---
 
@@ -88,4 +86,4 @@ npm run preview
 
 ## 📄 License
 
-MIT License — see [LICENSE](LICENSE) for details.
+[MIT License](LICENSE) — Copyright (c) 2026 Supan Roy
