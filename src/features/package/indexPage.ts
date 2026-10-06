@@ -79,13 +79,21 @@ export async function addIndexPage(params: IndexPageParams): Promise<IndexItem[]
 
   page.drawText('DOCUMENT INDEX & TABLE OF CONTENTS', {
     x: 55,
-    y: currentY - 44,
+    y: currentY - 42,
     size: 10,
     font: fontBold,
     color: rgb(0.85, 0.9, 0.98),
   });
 
-  currentY -= 75;
+  page.drawText('Included Documents and Starting Pages', {
+    x: 55,
+    y: currentY - 54,
+    size: 8,
+    font: fontRegular,
+    color: rgb(0.75, 0.82, 0.92),
+  });
+
+  currentY -= 85;
 
   // Table Header Box
   page.drawRectangle({
@@ -102,7 +110,7 @@ export async function addIndexPage(params: IndexPageParams): Promise<IndexItem[]
   page.drawText('Document Title (Requirement)', { x: 80, y: currentY - 15, size: 9, font: fontBold, color: primaryColor });
   page.drawText('Start Page', { x: width - 105, y: currentY - 15, size: 9, font: fontBold, color: primaryColor });
 
-  currentY -= 35;
+  currentY -= 40;
 
   // Render Index Rows with dot leaders
   const dotCharWidth = fontRegular.widthOfTextAtSize('.', 9);
@@ -151,13 +159,13 @@ export async function addIndexPage(params: IndexPageParams): Promise<IndexItem[]
 
     // Subtle line divider
     page.drawLine({
-      start: { x: 40, y: currentY - 8 },
-      end: { x: width - 40, y: currentY - 8 },
+      start: { x: 40, y: currentY - 10 },
+      end: { x: width - 40, y: currentY - 10 },
       thickness: 0.5,
       color: rgb(0.9, 0.92, 0.95),
     });
 
-    currentY -= 26;
+    currentY -= 32;
   });
 
   return indexItems;

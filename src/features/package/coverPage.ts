@@ -100,7 +100,7 @@ export async function addCoverPage(params: CoverPageParams): Promise<void> {
   currentY -= boxHeight + 30;
 
   // Included Documents Table Section
-  page.drawText('INCLUDED DOCUMENTS CHECKLIST', {
+  page.drawText('INCLUDED DOCUMENTS', {
     x: 40,
     y: currentY,
     size: 11,
@@ -108,34 +108,34 @@ export async function addCoverPage(params: CoverPageParams): Promise<void> {
     color: primaryColor,
   });
 
-  currentY -= 15;
+  currentY -= 18;
 
   // Table Header
   page.drawRectangle({
     x: 40,
-    y: currentY - 20,
+    y: currentY - 22,
     width: width - 80,
-    height: 20,
+    height: 22,
     color: primaryColor,
   });
 
-  page.drawText('#', { x: 48, y: currentY - 14, size: 9, font: fontBold, color: rgb(1, 1, 1) });
-  page.drawText('Document Title (Requirement)', { x: 75, y: currentY - 14, size: 9, font: fontBold, color: rgb(1, 1, 1) });
-  page.drawText('Filename', { x: 330, y: currentY - 14, size: 9, font: fontBold, color: rgb(1, 1, 1) });
-  page.drawText('Pages', { x: 505, y: currentY - 14, size: 9, font: fontBold, color: rgb(1, 1, 1) });
+  page.drawText('#', { x: 48, y: currentY - 15, size: 9, font: fontBold, color: rgb(1, 1, 1) });
+  page.drawText('Document Title (Requirement)', { x: 75, y: currentY - 15, size: 9, font: fontBold, color: rgb(1, 1, 1) });
+  page.drawText('Filename', { x: 330, y: currentY - 15, size: 9, font: fontBold, color: rgb(1, 1, 1) });
+  page.drawText('Pages', { x: 505, y: currentY - 15, size: 9, font: fontBold, color: rgb(1, 1, 1) });
 
-  currentY -= 20;
+  currentY -= 22;
 
   // Render document checklist rows
   matchedRequirements.forEach((item, index) => {
-    if (currentY < 80) return; // Prevent overflow off cover page bottom
+    if (currentY < 70) return; // Prevent overflow off cover page bottom
 
     const rowBg = index % 2 === 0 ? rgb(1, 1, 1) : rgb(0.97, 0.98, 0.99);
     page.drawRectangle({
       x: 40,
-      y: currentY - 20,
+      y: currentY - 22,
       width: width - 80,
-      height: 20,
+      height: 22,
       color: rowBg,
       borderColor: borderGray,
       borderWidth: 0.5,
@@ -149,11 +149,11 @@ export async function addCoverPage(params: CoverPageParams): Promise<void> {
       ? item.document.fileName.substring(0, 27) + '...'
       : item.document.fileName;
 
-    page.drawText(String(item.requirement.order), { x: 48, y: currentY - 14, size: 8.5, font: fontBold, color: darkColor });
-    page.drawText(titleStr, { x: 75, y: currentY - 14, size: 8.5, font: fontRegular, color: darkColor });
-    page.drawText(fileStr, { x: 330, y: currentY - 14, size: 8.5, font: fontRegular, color: primaryColor });
-    page.drawText(String(item.document.pageCount), { x: 515, y: currentY - 14, size: 8.5, font: fontBold, color: darkColor });
+    page.drawText(String(item.requirement.order), { x: 48, y: currentY - 15, size: 8.5, font: fontBold, color: darkColor });
+    page.drawText(titleStr, { x: 75, y: currentY - 15, size: 8.5, font: fontRegular, color: darkColor });
+    page.drawText(fileStr, { x: 330, y: currentY - 15, size: 8.5, font: fontRegular, color: primaryColor });
+    page.drawText(String(item.document.pageCount), { x: 515, y: currentY - 15, size: 8.5, font: fontBold, color: darkColor });
 
-    currentY -= 20;
+    currentY -= 22;
   });
 }
