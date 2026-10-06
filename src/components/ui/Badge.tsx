@@ -14,14 +14,14 @@ export const Badge: React.FC<BadgeProps> = ({ children, variant = 'default', sta
   if (status) {
     switch (status) {
       case 'OK':
-        colorClasses = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        colorClasses = 'bg-emerald-50 text-emerald-700 border-emerald-200 font-semibold';
         break;
       case 'EXPIRY_NEEDED':
-      case 'EXPIRED':
-        colorClasses = 'bg-amber-50 text-amber-800 border-amber-200';
+        colorClasses = 'bg-amber-50 text-amber-800 border-amber-200 font-semibold';
         break;
+      case 'EXPIRED':
       case 'MISSING':
-        colorClasses = 'bg-rose-50 text-rose-700 border-rose-200';
+        colorClasses = 'bg-rose-50 text-rose-700 border-rose-200 font-semibold';
         break;
       case 'NOT_PROVIDED':
         colorClasses = 'bg-slate-100 text-slate-600 border-slate-200';
