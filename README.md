@@ -1,25 +1,34 @@
-# TenderDesk — Tender Document Package Builder
+# TenderDesk
 
-> **Prepare. Verify. Package.**
+Tender Document Package Builder
 
-TenderDesk helps office staff turn a collection of PDF tender documents into one complete, validated, correctly ordered PDF package — running entirely locally in your browser.
+## Overview
 
----
+TenderDesk is a browser-based tool for turning tender PDF documents into a checked, correctly ordered final PDF package. It processes documents entirely locally in the user's browser, validating document requirements, checking expiry dates, detecting duplicate files, and stamping cover pages and page footers without sending any data to external servers.
 
-## 👤 Participant Details
+## Live Demo
 
-- **Name:** Supan Roy
-- **Live Demo (HTTPS):** [https://tenderdesk-theta.vercel.app](https://tenderdesk-theta.vercel.app)
+[https://tenderdesk-theta.vercel.app](https://tenderdesk-theta.vercel.app)
 
----
+## Features
 
-## 🚀 Quick Start
+- Load tender requirements from `requirements.json`
+- Tender details and requirement list overview
+- Multiple PDF document upload (up to 30 files / 50 MB total)
+- PDF validation, error handling, and page counting via `pdfjs-dist`
+- File removal and selection management
+- One-to-one document requirement matching
+- Expiry date entry and automated validity checks against submission deadline
+- Real-time document status engine (`MISSING`, `EXPIRY_NEEDED`, `EXPIRED`, `NOT_PROVIDED`, `OK`)
+- Cryptographic exact duplicate PDF detection using browser SHA-256 content hashing
+- Package generation blocking on mandatory missing or expired documents
+- Ordered PDF package generation using `pdf-lib`
+- Automated English cover page creation with tender details and included document checklist
+- Page numbering footer (`<tender_id> | Page X of Y`) stamped on every page
+- Standard package download naming (`<tender_id>_Package.pdf`)
+- Bilingual interface (English and Bangla)
 
-### Prerequisites
-- Node.js 18+
-- npm or yarn / pnpm
-
-### Installation & Running Locally
+## How to Run Locally
 
 ```bash
 # 1. Install dependencies
@@ -28,68 +37,55 @@ npm install
 # 2. Start local development server
 npm run dev
 
-# 3. Run automated test suite
+# 3. Run automated tests
 npm test
 
 # 4. Build for production
 npm run build
-
-# 5. Preview production build locally
-npm run preview
 ```
 
----
+## Main Features Completed
 
-## ✨ Features & Architecture
+- Requirements JSON Ingestion & Display
+- PDF Upload & Inspection
+- Document Matching UX
+- Expiry & Status Engine
+- Duplicate Detection
+- PDF Package Generation & Merging
+- Dynamic English Cover Page
+- Dynamic Page Footer Stamping (`<tender_id> | Page X of Y`)
+- Bilingual Support (English / Bangla)
+- Automated Vitest Test Suite
 
-- **Requirements Loading:** Dynamic JSON schema ingestion (`requirements.json`).
-- **Client-Side PDF Upload & Inspection:** Fast local PDF page count using `pdfjs-dist`.
-- **1-to-1 Document Matching:** Interactive requirement-to-file matching workflow.
-- **Expiry Validation:** Automated document validity check relative to tender submission deadline (`MISSING`, `EXPIRY_NEEDED`, `EXPIRED`, `NOT_PROVIDED`, `OK`).
-- **Real-Time Status Summary:** Dynamic status checklist & blocking issue warning indicators.
-- **Content Duplicate Detection:** Browser SHA-256 content hashing via Web Crypto API.
-- **Bilingual Support:** Lightweight i18n supporting English (`en`) and Bangla (`bn`).
-- **Automated Test Suite:** Comprehensive Vitest tests for tender JSON parsing, document status rules, matching invariants, and duplicate detection.
+## Bonus Features
 
----
+No bonus features implemented. Main contest requirements were prioritized.
 
-## 🎁 Bonus Features (Architected / Planned)
+## Known Problems / Limitations
 
-- Index page generation after cover
-- Digital seal / signature placement
-- Excel / CSV checklist export
-- Local browser state persistence (Save / Reopen)
-- Bangla text on generated cover & footers
-- Intelligent auto-matching based on filenames
-- Damaged / password-protected PDF safety handling
-- Optional client-side AI document matching helper
+No known issues. All 28 automated tests and production build verification passed cleanly.
 
----
+## AI Tools Used
 
-## 🛠️ Tech Stack
+- Google Antigravity
 
-- **Framework:** React 19 + TypeScript
-- **Bundler:** Vite 6
-- **Testing:** Vitest
-- **Styling:** Tailwind CSS
-- **PDF Libraries:** `pdf-lib` (generation/merging), `pdfjs-dist` (inspection/counting)
-- **Icons:** `lucide-react`
+## Most Useful AI Prompt
 
----
+"Implement the TenderDesk status engine and PDF package compiler using pdf-lib to insert an English cover page at index 0 and stamp '<tender_id> | Page X of Y' footers across all merged document pages."
 
-## 🤖 AI Assistance Declaration
+## Technical Stack
 
-- **AI Tools Used:** Antigravity AI Pair Programmer (Gemini 3.6 Flash)
-- **Most Useful Prompt:** *"Set up the initial TenderDesk repository architecture for a 90-minute AI Vibe-Coding contest following strict modular frontend boundaries."*
-
-## 🤝 Contributing & Community
-
-- [Contributing Guidelines](CONTRIBUTING.md)
-- [Code of Conduct](CODE_OF_CONDUCT.md)
-- [Security Policy](SECURITY.md)
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- pdf-lib
+- pdfjs-dist
+- Vitest
+- lucide-react
 
 ---
 
-## 📄 License
+## License
 
 [MIT License](LICENSE) — Copyright (c) 2026 Supan Roy

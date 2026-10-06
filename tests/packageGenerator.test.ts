@@ -33,7 +33,7 @@ describe('packageGenerator', () => {
     const pdf1 = await PDFDocument.create();
     pdf1.addPage([595, 842]);
     const pdf1Bytes = await pdf1.save();
-    const file1 = new File([pdf1Bytes], 'license.pdf', { type: 'application/pdf' });
+    const file1 = new File([pdf1Bytes.buffer as ArrayBuffer], 'license.pdf', { type: 'application/pdf' });
 
     const doc1: UploadedDocument = {
       id: 'doc-1',
