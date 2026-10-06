@@ -7,6 +7,7 @@ import { validatePdfFile, getPdfPageCount } from '@/features/documents/pdfUtils'
 import { validateUploadLimits, evaluateRequirementStatus, isBlockingStatus } from '@/features/documents/documentUtils';
 import { calculateFileHash, detectDuplicates } from '@/features/documents/duplicateDetector';
 import { generatePdfPackage, downloadPdfPackage } from '@/features/package/packageGenerator';
+import { autoMatchDocuments } from '@/features/matching/autoMatcher';
 
 export function useTenderDesk() {
   const [tenderState, dispatchTender] = useReducer(tenderReducer, initialTenderState);
@@ -219,8 +220,19 @@ export function useTenderDesk() {
   };
 
   /**
-   * Clears all uploaded documents & matches
+   * Auto-matches unassigned documents to requirements based on filename keyword similarity
    */
+  const handleAutoMatch = () => {
+    if (tenderState.requirements.length === 0 || documents.length === 0) return;
+    const newMatches = autoMatchDocuments(tenderState.requirements, documents, matches);
+    const addedCount = Object.keys(newMatches).length - Object.keys(matches).length;
+    setMatches(newMatches);
+    if (addedCount > 0) {
+      setInfoMessage(`Auto-matched ${addedCount} document(s) based on filenames.`);
+    } else {
+      setInfoMessage('Auto-match check completed. No new filename matches found.');
+    }
+  };
   const handleClearAllDocuments = () => {
     setDocuments([]);
     setMatches({});
@@ -311,6 +323,7 @@ export function useTenderDesk() {
     handlePdfFilesSelect,
     handleMatchDocument,
     handleUnmatchDocument,
+    handleAutoMatch,
     handleSetExpiryDate,
     handleRemoveDocument,
     handleClearAllDocuments,
