@@ -63,25 +63,35 @@ export function validateUploadLimits(
 }
 
 /**
- * Determines the document status based on requirement rules and expiry dates.
+ * Determines the deterministic document status for a requirement based on prompt rules:
+ * 1. If mandatory and no file matched → MISSING
+ * 2. Else if optional and no file matched → NOT_PROVIDED
+ * 3. Else if expiry required and no expiry date → EXPIRY_NEEDED
+ * 4. Else if expiry required and expiry date < submission_deadline → EXPIRED
+ * 5. Else → OK
  */
 export function evaluateRequirementStatus(params: StatusEvaluationParams): DocumentStatus {
   const { requirement, matchedDocument, expiryDate, submissionDeadline } = params;
 
+  // Rule 1 & 2: No file matched
   if (!matchedDocument) {
     return requirement.mandatory ? 'MISSING' : 'NOT_PROVIDED';
   }
 
+  // File is matched
   if (requirement.has_expiry) {
-    if (!expiryDate || expiryDate.trim() === '') {
+    // Rule 3: Expiry required but no expiry date entered
+    if (!expiryDate || !expiryDate.trim()) {
       return 'EXPIRY_NEEDED';
     }
 
-    if (submissionDeadline && expiryDate < submissionDeadline) {
+    // Rule 4: Expiry required and expiry date < submission_deadline
+    if (submissionDeadline && expiryDate.trim() < submissionDeadline.trim()) {
       return 'EXPIRED';
     }
   }
 
+  // Rule 5: Matched file and, where applicable, expiry date >= submission_deadline
   return 'OK';
 }
 
@@ -93,8 +103,18 @@ export function isBlockingStatus(status: DocumentStatus): boolean {
 }
 
 /**
- * Checks if a file has a valid .pdf extension / mime type
+ * Returns list of uploaded documents that are available to be matched to a given requirement
  */
-export function isPdfFile(file: File): boolean {
-  return file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+export function getAvailableDocuments(
+  allDocuments: UploadedDocument[],
+  matches: Record<string, string>,
+  currentRequirementId: string
+): UploadedDocument[] {
+  const matchedDocIds = new Set(
+    Object.entries(matches)
+      .filter(([reqId]) => reqId !== currentRequirementId)
+      .map(([, docId]) => docId)
+  );
+
+  return allDocuments.filter((doc) => !matchedDocIds.has(doc.id));
 }

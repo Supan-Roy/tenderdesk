@@ -20,14 +20,20 @@ export const AppContent: React.FC = () => {
     requirements,
     documents,
     matches,
+    expiryDates,
     isInspectingPdf,
     errorMessage,
     infoMessage,
+    blockingIssueCount,
+    isWorkspaceValid,
     clearError,
     clearInfo,
     loadSampleData,
     handleJsonFileSelect,
     handlePdfFilesSelect,
+    handleMatchDocument,
+    handleUnmatchDocument,
+    handleSetExpiryDate,
     handleRemoveDocument,
     handleClearAllDocuments,
     resetAll,
@@ -114,13 +120,25 @@ export const AppContent: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-3.5 rounded-lg border bg-slate-100 border-slate-200 text-slate-500 flex items-center space-x-3">
-            <div className="p-2 rounded-md bg-slate-200 text-slate-500">
+          <div
+            className={`p-3.5 rounded-lg border flex items-center space-x-3 transition-colors ${
+              isWorkspaceValid
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-900 shadow-2xs'
+                : 'bg-slate-100 border-slate-200 text-slate-500'
+            }`}
+          >
+            <div
+              className={`p-2 rounded-md ${
+                isWorkspaceValid ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500'
+              }`}
+            >
               <CheckCircle className="w-4 h-4" />
             </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider">{t.steps.verifyPackage}</p>
-              <p className="text-xs text-slate-500">Validation & packaging</p>
+              <p className="text-xs text-slate-500">
+                {isWorkspaceValid ? 'Verification Complete' : `${blockingIssueCount} issue(s) remaining`}
+              </p>
             </div>
           </div>
         </div>
@@ -209,6 +227,11 @@ export const AppContent: React.FC = () => {
               requirements={requirements}
               documents={documents}
               matches={matches}
+              expiryDates={expiryDates}
+              submissionDeadline={tender.submission_deadline}
+              onMatch={handleMatchDocument}
+              onUnmatch={handleUnmatchDocument}
+              onSetExpiryDate={handleSetExpiryDate}
             />
 
             <DocumentUploader
@@ -220,11 +243,13 @@ export const AppContent: React.FC = () => {
 
             <DocumentList
               documents={documents}
+              requirements={requirements}
+              matches={matches}
               onRemoveDocument={handleRemoveDocument}
               onClearAll={handleClearAllDocuments}
             />
 
-            <PackageActions isValid={false} />
+            <PackageActions isValid={isWorkspaceValid} blockingCount={blockingIssueCount} />
           </div>
         )}
       </main>

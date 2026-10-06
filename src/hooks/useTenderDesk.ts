@@ -4,7 +4,7 @@ import { UploadedDocument, RequirementsPayload } from '@/types';
 import { sampleRequirementsPayload } from '@/data/sampleData';
 import { parseAndValidateRequirementsJson } from '@/features/tender/tenderUtils';
 import { validatePdfFile, getPdfPageCount } from '@/features/documents/pdfUtils';
-import { validateUploadLimits } from '@/features/documents/documentUtils';
+import { validateUploadLimits, evaluateRequirementStatus, isBlockingStatus } from '@/features/documents/documentUtils';
 
 export function useTenderDesk() {
   const [tenderState, dispatchTender] = useReducer(tenderReducer, initialTenderState);
@@ -132,29 +132,92 @@ export function useTenderDesk() {
   };
 
   /**
-   * Removes an uploaded document by ID
+   * Matches a document to a requirement (1-to-1 relationship)
    */
-  const handleRemoveDocument = (id: string) => {
-    setDocuments((prev) => prev.filter((doc) => doc.id !== id));
-
-    // Cleanup matches if any match pointed to this document ID
+  const handleMatchDocument = (requirementId: string, documentId: string) => {
     setMatches((prev) => {
       const updated = { ...prev };
+
+      // Ensure no other requirement is matched to this same documentId
       for (const [reqId, docId] of Object.entries(updated)) {
-        if (docId === id) {
+        if (docId === documentId) {
           delete updated[reqId];
         }
       }
+
+      updated[requirementId] = documentId;
+      return updated;
+    });
+
+    // Reset expiry date for requirement when match changes
+    setExpiryDates((prev) => {
+      const updated = { ...prev };
+      delete updated[requirementId];
       return updated;
     });
   };
 
   /**
-   * Clears all uploaded documents
+   * Removes match for a requirement
+   */
+  const handleUnmatchDocument = (requirementId: string) => {
+    setMatches((prev) => {
+      const updated = { ...prev };
+      delete updated[requirementId];
+      return updated;
+    });
+
+    setExpiryDates((prev) => {
+      const updated = { ...prev };
+      delete updated[requirementId];
+      return updated;
+    });
+  };
+
+  /**
+   * Sets expiry date YYYY-MM-DD for a requirement
+   */
+  const handleSetExpiryDate = (requirementId: string, dateString: string) => {
+    setExpiryDates((prev) => ({
+      ...prev,
+      [requirementId]: dateString,
+    }));
+  };
+
+  /**
+   * Removes an uploaded document by ID & cleans up associated matches/expiry dates
+   */
+  const handleRemoveDocument = (id: string) => {
+    setDocuments((prev) => prev.filter((doc) => doc.id !== id));
+
+    let affectedReqId: string | null = null;
+    setMatches((prev) => {
+      const updated = { ...prev };
+      for (const [reqId, docId] of Object.entries(updated)) {
+        if (docId === id) {
+          affectedReqId = reqId;
+          delete updated[reqId];
+        }
+      }
+      return updated;
+    });
+
+    if (affectedReqId) {
+      setExpiryDates((prev) => {
+        const updated = { ...prev };
+        delete updated[affectedReqId!];
+        return updated;
+      });
+    }
+  };
+
+  /**
+   * Clears all uploaded documents & matches
    */
   const handleClearAllDocuments = () => {
     setDocuments([]);
     setMatches({});
+    setExpiryDates({});
   };
 
   /**
@@ -169,6 +232,29 @@ export function useTenderDesk() {
     setInfoMessage(null);
   };
 
+  // Compute total blocking issue count
+  let blockingIssueCount = 0;
+  if (tenderState.requirements.length > 0) {
+    for (const req of tenderState.requirements) {
+      const matchedDocId = matches[req.id];
+      const matchedDoc = documents.find((d) => d.id === matchedDocId);
+      const expiryDate = expiryDates[req.id] || '';
+
+      const status = evaluateRequirementStatus({
+        requirement: req,
+        matchedDocument: matchedDoc,
+        expiryDate,
+        submissionDeadline: tenderState.tender?.submission_deadline,
+      });
+
+      if (isBlockingStatus(status)) {
+        blockingIssueCount++;
+      }
+    }
+  }
+
+  const isWorkspaceValid = tenderState.requirements.length > 0 && blockingIssueCount === 0;
+
   return {
     tender: tenderState.tender,
     requirements: tenderState.requirements,
@@ -180,11 +266,16 @@ export function useTenderDesk() {
     isInspectingPdf,
     errorMessage,
     infoMessage,
+    blockingIssueCount,
+    isWorkspaceValid,
     clearError,
     clearInfo,
     loadSampleData,
     handleJsonFileSelect,
     handlePdfFilesSelect,
+    handleMatchDocument,
+    handleUnmatchDocument,
+    handleSetExpiryDate,
     handleRemoveDocument,
     handleClearAllDocuments,
     resetAll,
