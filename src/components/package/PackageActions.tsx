@@ -49,7 +49,7 @@ export const PackageActions: React.FC<PackageActionsProps> = ({
             variant="primary"
             disabled={!isValid || isGenerating}
             onClick={onGeneratePackage}
-            className="w-full sm:w-auto font-semibold shadow-xs"
+            className="w-full sm:w-auto font-semibold shadow-xs cursor-pointer"
           >
             {isGenerating ? (
               <>

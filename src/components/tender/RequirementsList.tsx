@@ -134,7 +134,7 @@ export const RequirementsList: React.FC<RequirementsListProps> = ({
                                 setChangingReqId(null);
                               }
                             }}
-                            className="w-full text-xs bg-white border border-slate-300 rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-2 focus:ring-blue-500 font-medium text-slate-700"
+                            className="w-full text-xs bg-white border border-slate-300 rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-2 focus:ring-blue-500 font-medium text-slate-700 cursor-pointer"
                           >
                             <option value="">-- {t.requirements.selectFilePlaceholder} --</option>
                             {availableDocs.map((doc) => (
@@ -148,7 +148,7 @@ export const RequirementsList: React.FC<RequirementsListProps> = ({
                               variant="ghost"
                               size="sm"
                               onClick={() => setChangingReqId(null)}
-                              className="text-slate-400 hover:text-slate-600 px-1.5"
+                              className="text-slate-400 hover:text-slate-600 px-1.5 cursor-pointer"
                             >
                               <XCircle className="w-4 h-4" />
                             </Button>
@@ -167,7 +167,7 @@ export const RequirementsList: React.FC<RequirementsListProps> = ({
                             <button
                               type="button"
                               onClick={() => setChangingReqId(req.id)}
-                              className="text-blue-700 hover:text-blue-900 hover:underline font-medium text-[11px] px-1"
+                              className="text-blue-700 hover:text-blue-900 hover:underline font-medium text-[11px] px-1 cursor-pointer"
                             >
                               {t.requirements.changeMatch}
                             </button>
@@ -178,7 +178,7 @@ export const RequirementsList: React.FC<RequirementsListProps> = ({
                                 onUnmatch(req.id);
                                 setChangingReqId(null);
                               }}
-                              className="text-rose-600 hover:text-rose-800 hover:underline font-medium text-[11px] px-1"
+                              className="text-rose-600 hover:text-rose-800 hover:underline font-medium text-[11px] px-1 cursor-pointer"
                             >
                               {t.requirements.unmatch}
                             </button>
@@ -186,10 +186,10 @@ export const RequirementsList: React.FC<RequirementsListProps> = ({
                         </div>
                       )}
 
-                      {/* Expiry Date Input (Only shown if matched AND requirement.has_expiry === true) */}
+                      {/* Expiry Date Input */}
                       {matchedDoc && req.has_expiry && (
                         <div className="flex items-center space-x-2 pt-1">
-                          <label className="text-xs text-slate-600 flex items-center space-x-1 shrink-0 font-medium">
+                          <label className="text-xs text-slate-600 flex items-center space-x-1 shrink-0 font-medium cursor-pointer">
                             <Calendar className="w-3.5 h-3.5 text-amber-600" />
                             <span>{t.requirements.expiryDateLabel}:</span>
                           </label>
@@ -197,7 +197,7 @@ export const RequirementsList: React.FC<RequirementsListProps> = ({
                             type="date"
                             value={expiryDate}
                             onChange={(e) => onSetExpiryDate(req.id, e.target.value)}
-                            className="text-xs bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 focus:outline-hidden focus:ring-1 focus:ring-blue-500 font-mono"
+                            className="text-xs bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 focus:outline-hidden focus:ring-1 focus:ring-blue-500 font-mono cursor-pointer"
                           />
                         </div>
                       )}

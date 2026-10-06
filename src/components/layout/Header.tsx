@@ -37,22 +37,22 @@ export const Header: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setLanguage('en')}
-                className={`flex items-center space-x-1 px-2.5 py-1 text-xs font-medium rounded-md transition-all ${
+                className={`flex items-center space-x-1 px-3 py-1.5 text-xs font-semibold rounded-md cursor-pointer transition-all ${
                   language === 'en'
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white text-blue-700 shadow-xs border border-slate-200/60'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
                 }`}
               >
-                <Globe className="w-3.5 h-3.5 text-slate-400" />
+                <Globe className="w-3.5 h-3.5 text-blue-600" />
                 <span>{t.nav.english}</span>
               </button>
               <button
                 type="button"
                 onClick={() => setLanguage('bn')}
-                className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all ${
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md cursor-pointer transition-all ${
                   language === 'bn'
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white text-blue-700 shadow-xs border border-slate-200/60'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
                 }`}
               >
                 <span>{t.nav.bangla}</span>

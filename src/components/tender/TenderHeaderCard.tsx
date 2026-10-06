@@ -43,7 +43,7 @@ export const TenderHeaderCard: React.FC<TenderHeaderCardProps> = ({
             variant="outline"
             size="sm"
             onClick={onChangeJson}
-            className="border-slate-700 bg-slate-800/80 text-slate-200 hover:bg-slate-800 shrink-0"
+            className="border-slate-700 bg-slate-800/80 text-slate-200 hover:bg-slate-800 shrink-0 cursor-pointer"
           >
             <Upload className="w-3.5 h-3.5 mr-1.5 text-blue-400" />
             {t.tenderDetails.changeJsonBtn}

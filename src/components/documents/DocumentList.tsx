@@ -77,7 +77,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
               <button
                 type="button"
                 onClick={onClearAll}
-                className="text-rose-600 hover:text-rose-700 font-medium text-xs transition-colors"
+                className="text-rose-600 hover:text-rose-700 font-semibold text-xs transition-colors cursor-pointer"
               >
                 {t.documents.removeAll}
               </button>
@@ -154,7 +154,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                     variant="ghost"
                     size="sm"
                     onClick={() => onRemoveDocument(doc.id)}
-                    className="text-slate-400 hover:text-rose-600 hover:bg-rose-50"
+                    className="text-slate-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
                     title={t.documents.remove}
                   >
                     <Trash2 className="w-4 h-4" />
