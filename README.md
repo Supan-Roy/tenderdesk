@@ -26,36 +26,38 @@ All document processing, hashing, PDF parsing, and compilation occur **100% loca
 Below is the complete client-side processing pipeline and architectural data flow of TenderDesk:
 
 ```mermaid
-graph TD
-    A[User / Bidder] -->|1. Ingest requirements.json| B[JSON Parser & Schema Validator]
-    A -->|2. Upload PDF Documents| C[Client-Side PDF Inspector]
-    
-    subgraph Browser Processing Pipeline (Zero Backend)
-        B --> D[Tender Workspace State Manager]
-        C -->|pdfjs-dist| E[PDF Page Counter & Header Inspector]
-        C -->|Web Crypto API| F[SHA-256 Binary Content Hasher]
-        
-        E --> G[Duplicate Content Detector]
+flowchart TD
+    A["User / Bidder"] -->|"1. Ingest requirements.json"| B["JSON Parser & Schema Validator"]
+    A -->|"2. Upload PDF Documents"| C["Client-Side PDF Inspector"]
+
+    subgraph Pipeline ["Browser Processing Pipeline - Zero Backend"]
+        direction TD
+        B --> D["Tender Workspace State Manager"]
+        C -->|"pdfjs-dist"| E["PDF Page Counter & Header Inspector"]
+        C -->|"Web Crypto API"| F["SHA-256 Binary Content Hasher"]
+
+        E --> G["Duplicate Content Detector"]
         F --> G
         G --> D
-        
-        D -->|User matches file & enters expiry| H[Real-time Status Engine]
-        H -->|Evaluates Invariants| I{Status Gatekeeper}
-        
-        I -->|MISSING / EXPIRED / EXPIRY_NEEDED| J[Block Package Generation]
-        I -->|All Mandatory OK| K[Package Compiler Engine]
-        
-        subgraph pdf-lib Compiler Engine
-            K --> L[1. Merge PDF Pages in Requirement Order]
-            K --> M[2. Insert English Cover Page at Index 0]
-            K --> N[3. Insert Table of Contents / Index at Index 1]
-            K --> O[4. Stamp Page Footers across All Pages]
+
+        D -->|"Match Files and Expiry"| H["Real-Time Status Engine"]
+        H -->|"Evaluate Invariants"| I{"Status Gatekeeper"}
+
+        I -->|"MISSING / EXPIRED / EXPIRY_NEEDED"| J["Block Package Generation"]
+        I -->|"All Mandatory OK"| K["Package Compiler Engine"]
+
+        subgraph PdfEngine ["pdf-lib Compiler Engine"]
+            direction TD
+            K --> L["1. Merge PDF Pages in Requirement Order"]
+            K --> M["2. Insert English Cover Page at Index 0"]
+            K --> N["3. Insert Table of Contents / Index at Index 1"]
+            K --> O["4. Stamp Page Footers across All Pages"]
         end
     end
-    
-    O -->|5. Download Uint8Array| P[<tender_id>_Package.pdf Download]
-    D -->|Export Action| Q[CSV Checklist Exporter]
-    D -->|Save Action| R[JSON Session Serializer & LocalStorage]
+
+    O -->|"5. Download Uint8Array"| P["Tender Package PDF Download"]
+    D -->|"Export Action"| Q["CSV Checklist Exporter"]
+    D -->|"Save Action"| R["JSON Session Serializer & LocalStorage"]
 ```
 
 ---
