@@ -82,6 +82,12 @@ npm run preview
 - **AI Tools Used:** Antigravity AI Pair Programmer (Gemini 3.6 Flash)
 - **Most Useful Prompt:** *"Set up the initial TenderDesk repository architecture for a 90-minute AI Vibe-Coding contest following strict modular frontend boundaries."*
 
+## 🤝 Contributing & Community
+
+- [Contributing Guidelines](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security Policy](SECURITY.md)
+
 ---
 
 ## 📄 License
